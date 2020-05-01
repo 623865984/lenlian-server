@@ -6,18 +6,31 @@ var driverinfo = require('../api/driverinfo.js');
 /* GET home page. */
 //进入主页面信息
 router.get('/', function(req, res, next) {
-    res.send('respond with a resource');
+    res.send('司机接口');
 });
 
 
-//查所有司机
+//添加新司机
+router.get('/driverAdd',function(req,res,next){
+	driverinfo.driveradd(req,res,next);
+});
+//登录
+router.get('/driverLogin',function(req,res,next){
+	driverinfo.driverlogin(req,res,next);
+});
+//按手机查询司机信息
+router.get('/driverInfos',function(req,res,next){
+	driverinfo.driverinfos(req,res,next);
+});
+//查询所有司机信息
 router.get('/driverAll',function(req,res,next){
 	driverinfo.driverAll(req,res,next);
 });
-//查所有车辆
-router.get('/carAll',function(req,res,next){
-	driverinfo.carAll(req,res,next);
+//改变工作状态
+router.get('/driverState',function(req,res,next){
+	driverinfo.driverstate(req,res,next);
 });
+
 
 
 module.exports = router;

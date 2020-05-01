@@ -29,6 +29,19 @@ router.get('/userInfos',function(req,res,next){
 router.get('/userAll',function(req,res,next){
 	userinfo.userAll(req,res,next);
 });
-
-
+/*   
+	地址模块  *********************************
+*/
+//添加地址
+router.get('/addressAdd',function(req,res,next){
+	userinfo.addressadd(req,res,next);
+});
+//查询用户地址信息
+router.get('/addressAll',function(req,res,next){
+	userinfo.addressall(req,res,next);
+});
+//删除地址
+router.get('/addressDel',function(req,res,next){
+	userinfo.addressdel(req,res,next);
+});
 module.exports = router;

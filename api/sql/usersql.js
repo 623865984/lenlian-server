@@ -6,6 +6,9 @@ var user={
 	userall: 'select * from user',
 	userinfos: 'select * from user where phonenumber=?',
 	logincheck: 'select * from user where phonenumber=? and password=?',
-	
+	/* 地址  */
+	addressAdd: 'INSERT INTO `user_address` (`uno`,`phonenumber`,`name`,`label`,`cityCode`,`detailed`,`isDefault`,`ctime`) VALUES(?,?,?,?,?,?,?,?)',
+	addressDel: 'delete from user_address where id=?',
+	addressAll: 'select * from user_address where uno=?'
 }
 module.exports = user;
