@@ -4,7 +4,7 @@ var $conf=require('../conf/db.js');
 var $util=require('../util/util.js');
 var $sql=require('./sql/order_user_sql.js');
 var moment = require('moment');
-const { query } = require('./async-db');
+const { query } = require('../util/async-db');
 //使用连接池
 var pool  = mysql.createPool($util.extend({}, $conf.mysql));
 
@@ -139,7 +139,7 @@ module.exports = {
 //修改订单状态
 	order_user_state_change: function (req, res, next) {
 	   pool.getConnection(function(err, connection) {
-		   let data;
+		   let data = {};
 		   var param = req.query || req.params;
 		   var sql;
 		   var states = ['待付款','待发货','待收货','待评价','已完成'];
@@ -162,16 +162,18 @@ module.exports = {
 		   }
 		   connection.query(sql, [state,param.id], function(err, result) {
 			   console.log(result)
-			   if(result.affectedRows>0) {
-				data = {
-					code: 0,
-					msg:'修改成功',
-				};
-			   } else {
-				   data = {
-					   code: 1,
-					   msg:'修改失败'
-				   };
+			   if(result) {
+				   if(result.affectedRows>0) {
+					data = {
+						code: 0,
+						msg:'修改成功',
+					};
+				   } else {
+					   data = {
+						   code: 1,
+						   msg:'修改失败'
+					   };
+				   }
 			   }
 			   setTimeout(() => {
 				jsonWrite(res, data)
@@ -221,9 +223,9 @@ module.exports = {
 		let data;
 		var sql ;
 		var sqlchaoshi = 'select * from order_user_chaoshi where id=?';
-		var sqlruku = 'select * from order_user_chaoshi where id=?';
-		var sqlsonghuo = 'select * from order_user_chaoshi where id=?';
-		var sqlpaidan = 'select * from order_user_chaoshi where id=?';
+		var sqlruku = 'select * from order_user_ruku where id=?';
+		var sqlsonghuo = 'select * from order_user_songhuo where id=?';
+		var sqlpaidan = 'select * from order_user_paidan where id=?';
 		var sqls = [sqlchaoshi,sqlruku,sqlsonghuo,sqlpaidan];
 		var tables = ['超市','提货入库','提货送货','仓库派单']
 		for(var i=0;i<tables.length;i++) {
@@ -232,6 +234,34 @@ module.exports = {
 			}
 		}
 		let dataList = await query(sql ,order_user_id)
+		// console.log(dataList)
 		return dataList
 	},
+// 查询待付款状态订单信息
+	order_state_id: async function (req, res, next) {
+		let data;
+		let daifu;
+		var sql ;
+		var param = req.query || req.params;
+		console.log(param.ordertype)
+		console.log(param.uno)
+		var sqlchaoshi = 'select id,state,ordertype from order_user_chaoshi where state="待付款" and uno=? ';
+		var sqlruku = 'select id,state,ordertype from order_user_ruku where state="待付款" and uno=?';
+		var sqlsonghuo = 'select id,state,ordertype from order_user_songhuo where state="待付款" and uno=?';
+		var sqlpaidan = 'select id,state,ordertype from order_user_paidan where state="待付款" and uno=?';
+		var sqls = [sqlchaoshi,sqlruku,sqlsonghuo,sqlpaidan];
+		var tables = ['超市','提货入库','提货送货','仓库派单']
+		for(var i=0;i<tables.length;i++) {
+			if(param.ordertype == tables[i]) {
+				sql = sqls[i];
+			}
+		}
+		daifu = await query(sql,param.uno)
+		console.log(daifu)
+		data = {
+			msg: '查询成功',
+			data_1: daifu
+		}
+		jsonWrite(res, data)
+	}
 };

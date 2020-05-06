@@ -26,11 +26,15 @@ driveradd: function (req, res, next) {
 	pool.getConnection(function(err, connection) {
 		let data
 		var character = "今天工作不努力，明天努力找工作！";
-		var imag = "../../static/img/im/face/face_5.jpg";
+		var imag = "/static/img/im/face/face_5.jpg";
 		var param = req.query || req.params;
 		var password = md5(param.password);
-		var ctime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
-		var nickname = "会飞的鱼"+ctime
+		var ctime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+		//生成昵称后缀码
+		var range = 50000; //取值范围的差
+		var random = Math.random(); //小于1的随机数
+		mix = 10000 + Math.round(random * range); //最小数与随机数和取值范围求和，返回想要的随机数字
+		var nickname = "会飞的鱼"+mix;
 		// 建立连接，向表中插入值
 		// 'INSERT INTO driver(id, name, age) VALUES(0,?,?)',
 		connection.query($sql.driverinfos, param.phonenumber, function(err, result) {

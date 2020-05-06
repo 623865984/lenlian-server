@@ -19,7 +19,7 @@ var order={
 		//查司机所有订单
 		order_driver_all: 'select * from order_driver where dno=?',
 		//查司机不同状态的订单
-		order_driver_state_all: 'select ordertype,order_user_id from order_driver where dno=? and state=?',
+		order_driver_state_all: 'select ordertype,order_user_id,id from order_driver where dno=? and state=?',
 	
 }
 

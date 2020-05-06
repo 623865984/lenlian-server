@@ -37,6 +37,10 @@ router.get('/order_user_state_Change',function(req,res,next){
 router.get('/order_user_state_Select',function(req,res,next){
 	order_user.order_user_state_select(req,res,next);
 });
+//查询待付款状态的订单
+router.get('/order_state_Id',function(req,res,next){
+	order_user.order_state_id(req,res,next);
+});
 
 /*
 	司机订单   **************************************************
@@ -54,5 +58,6 @@ router.get('/order_driver_state_Change',function(req,res,next){
 router.get('/order_driver_state_Select',function(req,res,next){
 	order_driver.order_driver_state_select(req,res,next);
 });
+
 
 module.exports = router;

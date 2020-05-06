@@ -9,6 +9,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var driver = require('./routes/driver');
 var order = require('./routes/order');
+var msg = require('./routes/msg');
 
 var app = express();
 
@@ -29,6 +30,7 @@ app.use('/', routes);
 app.use('/users', users);
 app.use('/driver', driver);
 app.use('/order', order);
+app.use('/msg', msg);
 
 app.get('/', (req, res) => res.send('这里是冷链物流后台'));
 console.log("后台服务启动成功，正在监听3000端口");

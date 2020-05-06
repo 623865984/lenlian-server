@@ -44,4 +44,8 @@ router.get('/addressAll',function(req,res,next){
 router.get('/addressDel',function(req,res,next){
 	userinfo.addressdel(req,res,next);
 });
+//修改地址信息
+router.get('/addressUpdate',function(req,res,next){
+	userinfo.addressupdate(req,res,next);
+});
 module.exports = router;

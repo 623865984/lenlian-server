@@ -3,8 +3,10 @@ var mysql=require('mysql');
 var $conf=require('../conf/db.js');
 var $util=require('../util/util.js');
 var $sql=require('./sql/usersql.js');
-var moment = require('moment')
+var moment = require('moment');
 var md5 = require('md5-node');
+const { gopush }=require('../util/goeasy.js');
+const { query } = require('../util/async-db');
 //使用连接池
 var pool  = mysql.createPool($util.extend({}, $conf.mysql));
 
@@ -26,12 +28,15 @@ useradd: function (req, res, next) {
 	pool.getConnection(function(err, connection) {
 		let data
 		var character = "开心每一天！";
-		var imag = "22";
+		var imag = "/static/img/im/face/face_2.jpg";
 		var param = req.query || req.params;
 		var password = md5(param.password);
-		var t1 = Date.now();
-		var ctime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
-		var nickname = "吴彦祖"+ctime
+		//生成昵称后缀码
+		var range = 50000; //取值范围的差
+		var random = Math.random(); //小于1的随机数
+		mix = 10000 + Math.round(random * range); //最小数与随机数和取值范围求和，返回想要的随机数字
+		var ctime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss');
+		var nickname = "吴彦祖"+mix;
 		// 建立连接，向表中插入值
 		// 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
 		connection.query($sql.userinfos, param.phonenumber, function(err, result) {
@@ -130,13 +135,13 @@ userAll: function (req, res, next) {
 */
 //增加地址
 addressadd: function (req, res, next) {
-pool.getConnection(function(err, connection) {
+ pool.getConnection(function(err, connection) {
 	let data
 	var param = req.query || req.params;
 	var ctime = moment(new Date()).format('YYYY-MM-DD HH:mm:ss')
 	// 建立连接，向表中插入值
 	// 'INSERT INTO user(id, name, age) VALUES(0,?,?)',
-	connection.query($sql.addressAdd, [param.uno, param.phonenumber,param.name,param.label,param.cityCode,param.detailed,param.isDefault,ctime], function(err, result) {
+	connection.query($sql.addressAdd, [param.uno, param.phonenumber,param.name,param.value,param.label,param.cityCode,param.detailed,param.isDefault,ctime], function(err, result) {
 		if(result.affectedRows>0) {
 			data = {
 				code: 0,
@@ -185,7 +190,7 @@ addressall: function (req, res, next) {
    });
 },
 //删除地址
-addressdel: function (req, res, next) {
+addressdel: function(req, res, next) {
        // delete by Id
        pool.getConnection(function(err, connection) {
            let data;
@@ -210,4 +215,51 @@ addressdel: function (req, res, next) {
            });
        });
    },
+//修改地址信息
+addressupdate: async function (req, res, next) {
+	let data;
+	let ok;
+	var param = req.query || req.params;
+	var sql = 'select id from user_address where uno=? and isDefault=1'
+	var before = await query(sql,param.uno)
+	ok = await query($sql.addressUpdate,[param.phonenumber,param.name,param.value,param.label,param.cityCode,param.detailed,param.id])
+	console.log(ok)
+	console.log(before[0])
+	if(ok.affectedRows>0){
+		data = {
+			code: 0,
+			msg:'修改成功',
+		};  
+	}else{
+		data = {
+			code: 1,
+			msg:'修改失败',
+		};  
+	}
+	//已经有默认地址时
+	if(before[0]) {
+		//isDefault为真时
+		if(param.isDefault) {
+			console.log(param.isDefault)
+			//当前不是默认地址时
+			if(param.id != before[0].id) {
+				console.log(param.id)
+				console.log(before[0].id)
+				await this.setdefault(param.id,before[0].id);
+			}
+		} 
+	}
+	//没有默认地址
+	else {
+		await query($sql.setDefault ,[1,param.id])
+	}
+	
+	jsonWrite(res, data)
+},
+//改变默认收货地址
+	setdefault: async function(now,before) {
+		await query($sql.setDefault ,[1,now])
+		await query($sql.setDefault ,[0,before])
+		
+	}
 }
