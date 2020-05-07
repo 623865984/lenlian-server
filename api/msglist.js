@@ -18,16 +18,9 @@ var jsonWrite = function (res, ret) {
 };
 
 module.exports = {
-/**
-     * 对数组中的对象，按对象的key进行sortType排序
-     * @param key 数组中的对象为object,按object中的key进行排序
-     * @param sortType true为降序；false为升序
-     */	
-keysort: function(key,sortType) {
-	return function(a,b){
-		return sortType ? ~~(a[key] < b[key]) : ~~(a[key] > b[key]);
-	}
-},
+sortId: function (a,b){  
+       return a.id-b.id  
+    },
 //增加消息
 msgadd: function (req, res, next) {
 	let data
@@ -126,12 +119,13 @@ msgAll: async function (req, res, next) {
 	result1 = result1.concat(result2)
 	result3 = result3.concat(result1)
 	result4 = result4.concat(result3)
-	result4.sort(this.keysort('ctime',false));
-	// console.log(result4)
+	var result5 = result4
+	result5.sort(this.sortId)
+	console.log(result5)
 	data = {
 		code: 0,
 		msg:'查询成功',
-		data_1: result4
+		data_1: result5
 	};
 	jsonWrite(res, data)
 },
@@ -159,7 +153,7 @@ nicname_face: async function (id,type) {
 	var result
 	var sql = 'select uno,nickname,image from user where  uno=? '
 	var sql1 = 'select dno,nickname,image from driver where  dno=? '
-	if(type == 'isUser'){
+	if(type == 'isuser'){
 		 result = await query(sql1,id)
 	}else{
 		 result = await query(sql,id)

@@ -4,7 +4,7 @@ var $conf=require('../conf/db.js');
 var $util=require('../util/util.js');
 var $sql=require('./sql/usersql.js');
 var moment = require('moment');
-var md5 = require('md5-node');
+// var md5 = require('md5-node');
 const { gopush }=require('../util/goeasy.js');
 const { query } = require('../util/async-db');
 //使用连接池
